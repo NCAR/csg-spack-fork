@@ -23,7 +23,7 @@ class Libfabric(AutotoolsPackage, CudaPackage):
     license("GPL-2.0-or-later")
 
     version("main", branch="main")
-    version("2.0.x", commit="5163e6ad58ed997b5f1b4dc02760655eb6ae9fd9")
+    version("2.0.x", commit="0e6f63f3ccb6f7ec180fab516135b2e6863c176f")
     version("2.0.0", sha256="1a8e40f1f331d6ee2e9ace518c0088a78c8a838968f8601c2b77fd012a7bf0f5")
     version("1.22.0", sha256="485e6cafa66c9e4f6aa688d2c9526e274c47fda3a783cf1dd8f7c69a07e2d5fe")
     version("1.21.1", sha256="54befa6697352f3179c79c4a79225ae71694f29eefad5d0d5a14b5444ff986dd")
