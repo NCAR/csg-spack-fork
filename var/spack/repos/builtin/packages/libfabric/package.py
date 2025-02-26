@@ -23,7 +23,7 @@ class Libfabric(AutotoolsPackage, CudaPackage):
     license("GPL-2.0-or-later")
 
     version("main", branch="main")
-    version("2.0.x", commit="0e6f63f3ccb6f7ec180fab516135b2e6863c176f")
+    version("2.0.x", commit="723fa853cc62203f5af899c4f6102c106bfe1731")
     version("2.0.0", sha256="1a8e40f1f331d6ee2e9ace518c0088a78c8a838968f8601c2b77fd012a7bf0f5")
     version("1.22.0", sha256="485e6cafa66c9e4f6aa688d2c9526e274c47fda3a783cf1dd8f7c69a07e2d5fe")
     version("1.21.1", sha256="54befa6697352f3179c79c4a79225ae71694f29eefad5d0d5a14b5444ff986dd")
@@ -200,6 +200,14 @@ class Libfabric(AutotoolsPackage, CudaPackage):
     def autoreconf(self, spec, prefix):
         bash = which("bash")
         bash("./autogen.sh")
+
+    # Currently get a segmentation fault otherwise. Sigh...
+    def flag_handler(self, name, flags):
+        if name == "cflags":
+            if self.spec.satisfies("fabrics=lnx"):
+                flags.append("-g")
+        
+        return None, None, flags
 
     def configure_args(self):
         args = [
