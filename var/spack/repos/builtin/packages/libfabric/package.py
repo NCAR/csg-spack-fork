@@ -23,8 +23,6 @@ class Libfabric(AutotoolsPackage, CudaPackage):
     license("GPL-2.0-or-later")
 
     version("main", branch="main")
-    version("2.0.x", git="https://github.com/vanderwb/libfabric.git", commit="31d0affc0362a06298d6a53a8544b7a6d052f95f")
-    version("2.0.0", sha256="1a8e40f1f331d6ee2e9ace518c0088a78c8a838968f8601c2b77fd012a7bf0f5")
     version("1.22.0", sha256="485e6cafa66c9e4f6aa688d2c9526e274c47fda3a783cf1dd8f7c69a07e2d5fe")
     version("1.21.1", sha256="54befa6697352f3179c79c4a79225ae71694f29eefad5d0d5a14b5444ff986dd")
     version("1.21.0", sha256="0c1b7b830d9147f661e5d7f359250b85b5a9885c330464cd3b5e5d35b86551c7")
@@ -73,7 +71,6 @@ class Libfabric(AutotoolsPackage, CudaPackage):
         "cxi",
         "efa",
         "gni",
-        "lnx",
         "mlx",
         "mrail",
         "opx",
@@ -137,16 +134,11 @@ class Libfabric(AutotoolsPackage, CudaPackage):
     depends_on("autoconf", when="@main", type="build")
     depends_on("automake", when="@main", type="build")
     depends_on("libtool", when="@main", type="build")
-    depends_on("m4", when="@2.0.x", type="build")
-    depends_on("autoconf", when="@2.0.x", type="build")
-    depends_on("automake", when="@2.0.x", type="build")
-    depends_on("libtool", when="@2.0.x", type="build")
     depends_on("json-c", when="fabrics=cxi")
     depends_on("curl", when="fabrics=cxi")
 
     conflicts("@1.9.0", when="platform=darwin", msg="This distribution is missing critical files")
     conflicts("fabrics=opx", when="@:1.14.99")
-    conflicts("fabrics=lnx", when="@:1.22")
     conflicts(
         "fabrics=opx",
         when="@1.20.0",
@@ -219,12 +211,9 @@ class Libfabric(AutotoolsPackage, CudaPackage):
         if self.spec.satisfies("fabrics=cxi"):
             args.append(f"--with-json-c={self.spec['json-c'].prefix}")
             args.append(f"--with-curl={self.spec['curl'].prefix}")
+            args.append(f"--with-cassini-headers={self.spec['cassini-headers'].prefix.include}")
+            args.append(f"--with-cxi-uapi-headers={self.spec['cxi-driver'].prefix.include}")
             args.append(f"--enable-cxi={self.spec['libcxi'].prefix}")
-
-            # These won't exist in spec if libcxi is an external
-            if "cxi-driver" in self.spec:
-                args.append(f"--with-cassini-headers={self.spec['cassini-headers'].prefix.include}")
-                args.append(f"--with-cxi-uapi-headers={self.spec['cxi-driver'].prefix.include}")
 
         return args
 
