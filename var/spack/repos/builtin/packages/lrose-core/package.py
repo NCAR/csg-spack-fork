@@ -34,3 +34,18 @@ class LroseCore(CMakePackage):
     depends_on("fftw@3:")
 
     root_cmakelists_dir = "codebase"
+
+    resource(
+        name="lrose-displays",
+        git="https://github.com/NCAR/lrose-displays",
+        branch="master"
+    )
+
+    # The CMake install does not install these components, and the color_scales needed by
+    # HawkEye do not come with the source code at all!
+    @run_after("install")
+    def add_extra_components(self):
+        prefix = self.prefix
+        install_tree("docs", "{}/docs".format(prefix))
+        install_tree("release_notes", "{}/release_notes".format(prefix))
+        install_tree("lrose-displays/color_scales", "{}/share/color_scales".format(prefix))
