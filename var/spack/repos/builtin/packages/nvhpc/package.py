@@ -27,6 +27,12 @@ _versions = {
             "https://developer.download.nvidia.com/hpc-sdk/25.3/nvhpc_2025_253_Linux_x86_64_cuda_multi.tar.gz",
         ),
     },
+    "25.1": {
+        "Linux-x86_64": (
+            "0813791f8363f4c493db7891b00396ce522cb73910279b8f18a440aedda6727c",
+            "https://developer.download.nvidia.com/hpc-sdk/25.1/nvhpc_2025_251_Linux_x86_64_cuda_multi.tar.gz",
+        ),
+    },
     "24.11": {
         "Linux-aarch64": (
             "f2f64e5dec5e90dad5e12a31a992172b0aa19abf872ef1c54a1a437c7008eefb",
