@@ -32,7 +32,7 @@ class Vexcl(CMakePackage):
     depends_on("opencl")
 
     depends_on("c", type="build")
-    depends_on("c++", type="build")
+    depends_on("cxx", type="build")
 
     def cmake_args(self):
         spec = self.spec
