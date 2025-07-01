@@ -13,4 +13,5 @@
 repos:
   builtin:
     git: https://github.com/NCAR/csg-spack-packages.git
+    destination: $spack/var/spack
   ncar.hpcd: $spack/var/spack/repos/spack_repo/ncar.hpcd
