@@ -49,7 +49,7 @@ from llnl.util.filesystem import (
 from llnl.util.symlink import symlink
 
 from spack.build_environment import MakeExecutable
-from spack.builder import BaseBuilder
+from spack.builder import BaseBuilder, Builder, register_builder
 from spack.config import determine_number_of_jobs
 from spack.deptypes import ALL_TYPES as all_deptypes
 from spack.directives import (
@@ -69,7 +69,7 @@ from spack.directives import (
     variant,
     version,
 )
-from spack.error import InstallError, NoHeadersError, NoLibrariesError
+from spack.error import CompilerError, InstallError, NoHeadersError, NoLibrariesError, SpackError
 from spack.install_test import (
     SkipTest,
     cache_extra_test_sources,
@@ -81,7 +81,13 @@ from spack.install_test import (
 )
 from spack.mixins import filter_compiler_wrappers
 from spack.multimethod import default_args, when
-from spack.package_base import build_system_flags, env_flags, inject_flags, on_package_attributes
+from spack.package_base import (
+    PackageBase,
+    build_system_flags,
+    env_flags,
+    inject_flags,
+    on_package_attributes,
+)
 from spack.package_completions import (
     bash_completion_path,
     fish_completion_path,
@@ -177,9 +183,11 @@ __all__ = [
     "resource",
     "variant",
     "version",
+    "CompilerError",
     "InstallError",
     "NoHeadersError",
     "NoLibrariesError",
+    "SpackError",
     "SkipTest",
     "cache_extra_test_sources",
     "check_outputs",
@@ -216,6 +224,9 @@ __all__ = [
     "cd",
     "pwd",
     "tty",
+    "Builder",
+    "PackageBase",
+    "register_builder",
 ]
 
 # These are just here for editor support; they may be set when the build env is set up.
