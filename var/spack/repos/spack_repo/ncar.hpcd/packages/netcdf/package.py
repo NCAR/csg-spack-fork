@@ -55,7 +55,7 @@ class Netcdf(BundlePackage):
     depends_on('netcdf-fortran@4.5.3', when='@4.8.1')
     depends_on('netcdf-cxx4@4.3.1', when='@4.8.1:')
 
-    for comp_name in ("gcc", "nvhpc", "intel-oneapi-compilers", "cce", "clang"):
+    for comp_name in ("gcc", "nvhpc", "intel-oneapi-compilers", "cce", "clang", "aocc"):
         with when(f"%{comp_name}"):
             depends_on(f"netcdf-c %{comp_name}")
             depends_on(f"netcdf-cxx4 %{comp_name}")
