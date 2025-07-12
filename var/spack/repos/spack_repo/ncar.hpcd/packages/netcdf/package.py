@@ -33,6 +33,8 @@ class Netcdf(BundlePackage):
     variant('dap', default=False, description='Enable DAP support')
     
     depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
 
     depends_on('netcdf-c +mpi', when='+mpi')
     depends_on('netcdf-c ~mpi', when='~mpi')
