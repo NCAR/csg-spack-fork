@@ -17,16 +17,14 @@ from collections import namedtuple
 from typing import Callable, Dict, List, Optional, Set, Tuple, Union
 from urllib.request import Request
 
-import llnl.path
-import llnl.util.filesystem as fs
-import llnl.util.tty as tty
-from llnl.util.tty.color import cescape, colorize
-
 import spack
 import spack.binary_distribution as bindist
 import spack.builder
 import spack.config as cfg
 import spack.environment as ev
+import spack.llnl.path
+import spack.llnl.util.filesystem as fs
+import spack.llnl.util.tty as tty
 import spack.main
 import spack.mirrors.mirror
 import spack.paths
@@ -41,6 +39,7 @@ import spack.util.url as url_util
 import spack.util.web as web_util
 from spack import traverse
 from spack.error import SpackError
+from spack.llnl.util.tty.color import cescape, colorize
 from spack.reporters.cdash import SPACK_CDASH_TIMEOUT
 from spack.version import GitVersion, StandardVersion
 
@@ -138,7 +137,7 @@ def stack_changed(env_path: str) -> bool:
     Returns True iff the environment manifest changed between the provided revisions (or
     additionally if the `.gitlab-ci.yml` file itself changed)."""
     # git returns posix paths always, normalize input to be compatible with that
-    env_path = llnl.path.convert_to_posix_path(os.path.dirname(env_path))
+    env_path = spack.llnl.path.convert_to_posix_path(os.path.dirname(env_path))
 
     git = spack.util.git.git(required=True)
     git_dir = get_git_root(env_path)
@@ -217,7 +216,7 @@ def get_spec_filter_list(
 
 
 # Pruning functions should take a spack.spec.Spec object and
-# return a RebuildDecision containg the pruners opinion on
+# return a RebuildDecision containing the pruners opinion on
 # whether or not to keep (rebuild) the spec and a message
 # containing the reason for the decision.
 
@@ -451,17 +450,16 @@ def get_unaffected_pruners(
 
         affected_pkgs.update(repo_affected_pkgs)
 
+    if not affected_pkgs:
+        tty.info("Skipping unaffected pruning: no package changes were detected")
+        return None
+
     affected_specs = get_spec_filter_list(
         env, affected_pkgs, dependent_traverse_depth=untouched_pruning_dependent_depth
     )
     tty.debug(f"dependent_traverse_depth={untouched_pruning_dependent_depth}, affected specs:")
     for s in affected_specs:
         tty.debug(f"  {PipelineDag.key(s)}")
-
-    # If specs changed, but no packages were affected, rebuild everything that has changed.
-    if not affected_specs:
-        tty.info("Skipping unaffected pruning no package changes were detected")
-        return None
 
     return create_unaffected_pruner(affected_specs)
 
@@ -616,7 +614,7 @@ def can_sign_binaries():
 
 
 def can_verify_binaries():
-    """Utility method to determin if this spack instance is capable (at
+    """Utility method to determine if this spack instance is capable (at
     least in theory) of verifying signed binaries."""
     return len(gpg_util.public_keys()) >= 1
 
@@ -879,7 +877,7 @@ def reproduce_ci_job(url, work_dir, autostart, gpg_url, runtime, use_local_head)
     """
     work_dir = os.path.realpath(work_dir)
     if os.path.exists(work_dir) and os.listdir(work_dir):
-        raise SpackError(f"Cannot run reproducer in non-emptry working dir:\n  {work_dir}")
+        raise SpackError(f"Cannot run reproducer in non-empty working dir:\n  {work_dir}")
 
     platform_script_ext = "ps1" if IS_WINDOWS else "sh"
     artifact_root = download_and_extract_artifacts(url, work_dir)

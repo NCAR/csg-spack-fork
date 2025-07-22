@@ -11,13 +11,12 @@ Configuration Files
 Spack has many configuration files. Here is a quick list of them, in
 case you want to skip directly to specific docs:
 
-* :ref:`packages.yaml <compiler-config>`
 * :ref:`concretizer.yaml <concretizer-options>`
 * :ref:`config.yaml <config-yaml>`
 * :ref:`include.yaml <include-yaml>`
 * :ref:`mirrors.yaml <mirrors>`
 * :ref:`modules.yaml <modules>`
-* :ref:`packages.yaml <packages-config>`
+* :ref:`packages.yaml <packages-config>` (including :ref:`compiler configuration <compiler-config>`)
 * :ref:`repos.yaml <repositories>`
 
 You can also add any of these as inline configuration in the YAML
@@ -254,7 +253,7 @@ Platform-specific Configuration
 
    Prior to v1.0, each scope above -- except environment scopes -- had a
    corresponding platform-specific scope (e.g., ``defaults/linux``,
-   ``system/windows``). This can now be accomplished through suitably
+   ``system/windows``). This can now be accomplished through a suitably
    placed :ref:`include.yaml <include-yaml>` file.
 
 There is often a need for platform-specific configuration settings.
@@ -543,7 +542,7 @@ Spack understands over a dozen special variables. These are:
 * ``$arch``: alias for ``$architecture``.
 * ``$platform``: the platform of the current host, as detected by Spack.
 * ``$operating_system``: the operating system of the current host, as
-  detected by the ``distro`` python module.
+  detected by the ``distro`` Python module.
 * ``$os``: alias for ``$operating_system``.
 * ``$target``: the ISA target for the current host, as detected by
   ArchSpec. E.g. ``skylake`` or ``neoverse-n1``.

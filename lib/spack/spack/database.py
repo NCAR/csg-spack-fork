@@ -51,11 +51,10 @@ except ImportError:
     _use_uuid = False
     pass
 
-import llnl.util.filesystem as fs
-import llnl.util.tty as tty
-
 import spack.deptypes as dt
 import spack.hash_types as ht
+import spack.llnl.util.filesystem as fs
+import spack.llnl.util.tty as tty
 import spack.spec
 import spack.traverse as tr
 import spack.util.lock as lk
@@ -72,7 +71,7 @@ from spack.util.socket import _getfqdn
 
 from .enums import InstallRecordStatus
 
-# TODO: Provide an API automatically retyring a build after detecting and
+# TODO: Provide an API automatically retrying a build after detecting and
 # TODO: clearing a failure.
 
 #: DB goes in this directory underneath the root
@@ -800,9 +799,6 @@ class Database:
 
         Does not do any locking.
         """
-        if not filename.is_file():
-            raise FileNotFoundError(f"database does not exist {filename}")
-
         try:
             # In the future we may use a stream of JSON objects, hence `raw_decode` for compat.
             fdata, _ = JSONDecoder().raw_decode(filename.read_text(encoding="utf-8"))

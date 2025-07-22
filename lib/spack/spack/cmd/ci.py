@@ -10,10 +10,6 @@ import sys
 from typing import Dict
 from urllib.parse import urlparse, urlunparse
 
-import llnl.util.filesystem as fs
-import llnl.util.tty.color as clr
-from llnl.util import tty
-
 import spack.binary_distribution as bindist
 import spack.ci as spack_ci
 import spack.cmd
@@ -24,6 +20,8 @@ import spack.environment as ev
 import spack.error
 import spack.fetch_strategy
 import spack.hash_types as ht
+import spack.llnl.util.filesystem as fs
+import spack.llnl.util.tty.color as clr
 import spack.mirrors.mirror
 import spack.package_base
 import spack.repo
@@ -35,6 +33,7 @@ import spack.util.timer as timer
 import spack.util.url as url_util
 import spack.util.web as web_util
 import spack.version
+from spack.llnl.util import tty
 
 description = "manage continuous integration pipelines"
 section = "build"
@@ -94,7 +93,7 @@ def setup_parser(subparser: argparse.ArgumentParser) -> None:
         "--prune-unaffected",
         action="store_true",
         dest="prune_unaffected",
-        default=True,
+        default=False,
         help="skip up-to-date specs\n\n"
         "do not generate jobs for specs that are up-to-date on the mirror",
     )
@@ -102,7 +101,7 @@ def setup_parser(subparser: argparse.ArgumentParser) -> None:
         "--no-prune-unaffected",
         action="store_false",
         dest="prune_unaffected",
-        default=True,
+        default=False,
         help="process up-to-date specs\n\n"
         "generate jobs for specs even when they are up-to-date on the mirror",
     )
