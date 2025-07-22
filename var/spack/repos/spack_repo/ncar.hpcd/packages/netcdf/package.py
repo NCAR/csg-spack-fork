@@ -31,6 +31,10 @@ class Netcdf(BundlePackage):
             description='Enable parallel I/O for classic files')
     variant('hdf4', default=False, description='Enable HDF4 support')
     variant('dap', default=False, description='Enable DAP support')
+    
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
 
     depends_on('netcdf-c +mpi', when='+mpi')
     depends_on('netcdf-c ~mpi', when='~mpi')
@@ -52,6 +56,13 @@ class Netcdf(BundlePackage):
     depends_on('netcdf-fortran@4.6.0', when='@4.9.0:4.9.1')
     depends_on('netcdf-fortran@4.5.3', when='@4.8.1')
     depends_on('netcdf-cxx4@4.3.1', when='@4.8.1:')
+
+    for comp_name in ("gcc", "nvhpc", "intel-oneapi-compilers", "cce", "clang", "aocc"):
+        with when(f"%{comp_name}"):
+            depends_on(f"netcdf-c %{comp_name}")
+            depends_on(f"netcdf-cxx4 %{comp_name}")
+            depends_on(f"netcdf-fortran %{comp_name}")
+            depends_on(f"hdf5 %{comp_name}")
 
     def install(self, spec, prefix):
         for dep in ['netcdf-c', 'netcdf-fortran', 'netcdf-cxx4']:
