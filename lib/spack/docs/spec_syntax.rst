@@ -2,6 +2,10 @@
 
    SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+.. meta::
+   :description lang=en:
+      A detailed guide to the Spack spec syntax for describing package constraints, including versions, variants, and dependencies.
+
 .. _sec-specs:
 
 ===========
@@ -279,7 +283,7 @@ There are different types of variants:
 
          ~debug
 
-   .. tab-item:: Single-valued Variants.
+   .. tab-item:: Single-valued Variants
 
       Often used to set defaults.
       For example, a package might have a ``compression`` variant that determines the default compression algorithm, which users could set to:
@@ -427,6 +431,9 @@ The six compiler flags are injected in the same order as implicit make commands
 in GNU Autotools. If all flags are set, the order is
 ``$cppflags $cflags|$cxxflags $ldflags <command> $ldlibs`` for C and C++, and
 ``$fflags $cppflags $ldflags <command> $ldlibs`` for Fortran.
+
+
+.. _architecture_specifiers:
 
 -----------------------
 Architecture specifiers
