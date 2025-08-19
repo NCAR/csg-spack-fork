@@ -1061,6 +1061,7 @@ class Repo:
             config.get("subdirectory", packages_dir_name), root, self.package_api
         )
         self.packages_path = os.path.join(self.root, self.subdirectory)
+        self.build_systems_path = os.path.join(self.root, "build_systems")
 
         check(
             os.path.isdir(self.packages_path),
@@ -1705,12 +1706,16 @@ class RemoteRepoDescriptor(RepoDescriptor):
                         spack.util.git.init_git_repo(self.repository, remote=remote, git_exe=git)
 
                         # determine the default branch from ls-remote
-                        refs = git("ls-remote", "--symref", remote, "HEAD", output=str)
-                        ref_match = re.search(r"refs/heads/(\S+)", refs)
-                        if not ref_match:
-                            self.error = f"Unable to locate a default branch for {self.repository}"
-                            return
-                        self.branch = ref_match.group(1)
+                        # (if no branch, tag, or commit is specified)
+                        if not (self.commit or self.tag or self.branch):
+                            refs = git("ls-remote", "--symref", remote, "HEAD", output=str)
+                            ref_match = re.search(r"refs/heads/(\S+)", refs)
+                            if not ref_match:
+                                self.error = (
+                                    f"Unable to locate a default branch for {self.repository}"
+                                )
+                                return
+                            self.branch = ref_match.group(1)
 
                     # determine the branch and remote if no config values exist
                     elif not (self.commit or self.tag or self.branch):

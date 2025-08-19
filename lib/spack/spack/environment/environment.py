@@ -58,6 +58,10 @@ spack_env_view_var = "SPACK_ENV_VIEW"
 #: currently activated environment
 _active_environment: Optional["Environment"] = None
 
+# This is used in spack.main to bypass env failures if the command is `spack config edit`
+# It is used in spack.cmd.config to get the path to a failed env for `spack config edit`
+#: Validation error for a currently activate environment that failed to parse
+_active_environment_error: Optional[spack.config.ConfigFormatError] = None
 
 #: default path where environments are stored in the spack tree
 default_env_path = os.path.join(spack.paths.var_path, "environments")
@@ -441,6 +445,9 @@ def _rewrite_relative_repos_paths_on_relocation(env, init_file_dir):
         if not repos_specs:
             return
         for name, entry in list(repos_specs.items()):
+            # only rewrite when we have a path-based repository
+            if not isinstance(entry, str):
+                continue
             repo_path = substitute_path_variables(entry)
             expanded_path = spack.util.path.canonicalize_path(repo_path, default_wd=init_file_dir)
 
@@ -583,7 +590,7 @@ def _read_yaml(str_or_file):
         data = syaml.load_config(str_or_file)
     except syaml.SpackYAMLError as e:
         raise SpackEnvironmentConfigError(
-            f"Invalid environment configuration detected: {e.message}"
+            f"Invalid environment configuration detected: {e.message}", e.filename
         )
 
     filename = getattr(str_or_file, "name", None)
@@ -3022,3 +3029,7 @@ class SpackEnvironmentViewError(SpackEnvironmentError):
 
 class SpackEnvironmentConfigError(SpackEnvironmentError):
     """Class for Spack environment-specific configuration errors."""
+
+    def __init__(self, msg, filename):
+        self.filename = filename
+        super().__init__(msg)

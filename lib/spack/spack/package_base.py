@@ -57,7 +57,7 @@ from spack.error import InstallError, NoURLError, PackageError
 from spack.filesystem_view import YamlFilesystemView
 from spack.llnl.util.lang import ClassProperty, classproperty, memoized
 from spack.resource import Resource
-from spack.solver.version_order import concretization_version_order
+from spack.solver.versions import concretization_version_order
 from spack.util.package_hash import package_hash
 from spack.util.typing import SupportsRichComparison
 from spack.version import GitVersion, StandardVersion, VersionError, is_git_version
@@ -530,16 +530,16 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
 
     There are two main parts of a Spack package:
 
-      1. **The package class**.  Classes contain ``directives``, which are special functions, that
-         add metadata (versions, patches, dependencies, and other information) to packages (see
-         ``directives.py``). Directives provide the constraints that are used as input to the
-         concretizer.
+    1. **The package class**.  Classes contain ``directives``, which are special functions, that
+       add metadata (versions, patches, dependencies, and other information) to packages (see
+       ``directives.py``). Directives provide the constraints that are used as input to the
+       concretizer.
 
-      2. **Package instances**. Once instantiated, a package can be passed to the PackageInstaller.
-         It calls methods like ``do_stage()`` on the ``Package`` object, and it uses those to drive
-         user-implemented methods like ``patch()``, ``install()``, and other build steps. To
-         install software, an instantiated package needs a *concrete* spec, which guides the
-         behavior of the various install methods.
+    2. **Package instances**. Once instantiated, a package can be passed to the PackageInstaller.
+       It calls methods like ``do_stage()`` on the ``Package`` object, and it uses those to drive
+       user-implemented methods like ``patch()``, ``install()``, and other build steps. To
+       install software, an instantiated package needs a *concrete* spec, which guides the
+       behavior of the various install methods.
 
     Packages are imported from repos (see ``repo.py``).
 
@@ -648,12 +648,12 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
     transitive_rpaths = True
 
     #: List of shared objects that should be replaced with a different library at
-    #: runtime. Typically includes stub libraries like libcuda.so. When linking
+    #: runtime. Typically includes stub libraries like ``libcuda.so``. When linking
     #: against a library listed here, the dependent will only record its soname
     #: or filename, not its absolute path, so that the dynamic linker will search
     #: for it. Note: accepts both file names and directory names, for example
-    #: ``["libcuda.so", "stubs"]`` will ensure libcuda.so and all libraries in the
-    #: stubs directory are not bound by path."""
+    #: ``["libcuda.so", "stubs"]`` will ensure ``libcuda.so`` and all libraries in the
+    #: ``stubs`` directory are not bound by path.
     non_bindable_shared_objects: List[str] = []
 
     #: List of fnmatch patterns of library file names (specifically DT_NEEDED entries) that are not
@@ -924,10 +924,11 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
         """Keep ``-Werror`` flags, matches ``config:flags:keep_werror`` to override config.
 
         Valid return values are:
+
         * ``"all"``: keep all ``-Werror`` flags.
         * ``"specific"``: keep only ``-Werror=specific-warning`` flags.
         * ``"none"``: filter out all ``-Werror*`` flags.
-        * ``None``: respect the user's configuration (``"none"`` by default).
+        * :data:`None`: respect the user's configuration (``"none"`` by default).
         """
         if self.spec.satisfies("%nvhpc@:23.3"):
             # Filtering works by replacing -Werror with -Wno-error, but older nvhpc and
@@ -969,10 +970,9 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
 
         This uses the following precedence order:
 
-          1. Find the next lowest or equal version with a URL.
-          2. If no lower URL, return the next *higher* URL.
-          3. If no higher URL, return None.
-
+        1. Find the next lowest or equal version with a URL.
+        2. If no lower URL, return the next *higher* URL.
+        3. If no higher URL, return None.
         """
         version_urls = self.version_urls()
 
@@ -1398,7 +1398,8 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
         if not self.spec.versions.concrete:
             raise ValueError("Cannot retrieve fetcher for package without concrete version.")
         if not self._fetcher:
-            self._fetcher = fs.for_package_version(self)
+            # assign private member with the public setter api for error checking
+            self.fetcher = fs.for_package_version(self)
         return self._fetcher
 
     @fetcher.setter
@@ -1543,13 +1544,13 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
         spack.store.STORE.layout.remove_install_directory(self.spec)
 
     @property
-    def download_instr(self):
+    def download_instr(self) -> str:
         """
         Defines the default manual download instructions.  Packages can
         override the property to provide more information.
 
         Returns:
-            (str):  default manual download instructions
+            default manual download instructions
         """
         required = (
             f"Manual download is required for {self.spec.name}. " if self.manual_download else ""
@@ -1998,7 +1999,7 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
 
         self.tester.stand_alone_tests(kwargs, timeout=timeout)
 
-    def unit_test_check(self):
+    def unit_test_check(self) -> bool:
         """Hook for unit tests to assert things about package internals.
 
         Unit tests can override this function to perform checks after
@@ -2007,11 +2008,11 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
 
         The overridden function may indicate that the install procedure
         should terminate early (before updating the database) by
-        returning ``False`` (or any value such that ``bool(result)`` is
-        ``False``).
+        returning :data:`False` (or any value such that ``bool(result)`` is
+        :data:`False`).
 
         Return:
-            (bool): ``True`` to continue, ``False`` to skip ``install()``
+            :data:`True` to continue, :data:`False` to skip ``install()``
         """
         return True
 
@@ -2279,7 +2280,7 @@ class PackageBase(WindowsRPath, PackageViewMixin, metaclass=PackageMeta):
         Uses ``list_url`` and any other URLs listed in the package file.
 
         Returns:
-            dict: a dictionary mapping versions to URLs
+            a dictionary mapping versions to URLs
         """
         if not self.all_urls:
             return {}
