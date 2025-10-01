@@ -198,13 +198,6 @@ class MakefileBuilder(spack.build_systems.makefile.MakefileBuilder):
     # below sets the compilers to the MPI wrappers.
     filter_compiler_wrappers("esmf.mk", relative_root="lib")
 
-    # Make script from mvapich2.patch executable
-    @when("@:7.0")
-    @run_before("build")
-    def chmod_scripts(self):
-        chmod = which("chmod")
-        chmod("+x", "scripts/libs.mvapich2f90")
-
     def url_for_version(self, version):
         if version < Version("8.0.0"):
             # Older ESMF releases had a custom tag format ESMF_x_y_z
