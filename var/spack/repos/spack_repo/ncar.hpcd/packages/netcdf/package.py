@@ -81,7 +81,7 @@ class Netcdf(BundlePackage):
                         shutil.copytree(dep_sub, my_sub, dirs_exist_ok = True)
     
     def setup_run_environment(self, env: EnvironmentModifications) -> None:
-        """Adds environment variables to the generated module file.
-        """
-        
         env.set("NETCDF", self.prefix)
+
+        if self.spec["netcdf-c"].satisfies("@4.9.0:+shared"):
+            env.append_path("HDF5_PLUGIN_PATH", self.prefix.plugins)
