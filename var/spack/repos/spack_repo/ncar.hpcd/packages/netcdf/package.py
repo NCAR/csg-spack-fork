@@ -31,6 +31,7 @@ class Netcdf(BundlePackage):
             description='Enable parallel I/O for classic files')
     variant('hdf4', default=False, description='Enable HDF4 support')
     variant('dap', default=False, description='Enable DAP support')
+    variant('debug', default=False, description='Enable debug builds')
     
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -46,6 +47,9 @@ class Netcdf(BundlePackage):
     depends_on('netcdf-c ~parallel-netcdf', when='~parallel-netcdf')
     depends_on('netcdf-fortran')
     depends_on('netcdf-cxx4')
+    depends_on('netcdf-c +logging build_type=Debug', when='+debug')
+    depends_on('netcdf-fortran cppflags=-g', when='+debug')
+    depends_on('netcdf-cxx4 build_type=Debug', when='+debug')
 
     depends_on('netcdf-c@4.9.3', when='@4.9.3')
     depends_on('netcdf-c@4.9.2', when='@4.9.2')
