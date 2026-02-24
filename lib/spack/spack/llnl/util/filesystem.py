@@ -1811,6 +1811,14 @@ def _dedupe_files(paths: List[str]) -> List[str]:
             visited.add(file_id)
     return unique_files
 
+def is_root_directory(curr_dir):
+    """
+    Check if the given directory is the top-level root directory.
+    Works on Windows, macOS, and Linux.
+    """
+    from pathlib import Path
+    path = Path(curr_dir).resolve()  # Resolve symlinks and normalize path
+    return path == path.anchor or path.parent == path
 
 def _find_max_depth(
     roots: Sequence[Path], globs: Sequence[str], max_depth: int = sys.maxsize
@@ -1846,6 +1854,8 @@ def _find_max_depth(
 
     while dir_queue:
         depth, curr_dir = dir_queue.pop()
+        if is_root_directory(curr_dir):
+            continue
         try:
             dir_iter = os.scandir(curr_dir)
         except OSError as e:
