@@ -47,7 +47,7 @@ class Netcdf(BundlePackage):
     depends_on('netcdf-c ~parallel-netcdf', when='~parallel-netcdf')
     depends_on('netcdf-fortran')
     depends_on('netcdf-cxx4')
-    depends_on('netcdf-c +logging build_type=Debug', when='+debug')
+    depends_on('netcdf-c +logging cppflags=-g', when='+debug')
     depends_on('netcdf-fortran cppflags=-g', when='+debug')
     depends_on('netcdf-cxx4 build_type=Debug', when='+debug')
 
