@@ -1919,6 +1919,12 @@ def _dedupe_files(paths: List[str]) -> List[str]:
     return unique_files
 
 
+def is_root_directory(curr_dir):
+    from pathlib import Path
+    path = Path(curr_dir).resolve()
+    return path == path.anchor or path.parent == path
+
+
 def _find_max_depth(
     roots: Sequence[Path], globs: Sequence[str], max_depth: int = sys.maxsize
 ) -> List[str]:
@@ -1953,6 +1959,8 @@ def _find_max_depth(
 
     while dir_queue:
         depth, curr_dir = dir_queue.pop()
+        if is_root_directory(curr_dir):
+            continue
         try:
             dir_iter = os.scandir(curr_dir)
         except OSError as e:
